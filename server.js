@@ -1,11 +1,19 @@
 import express from "express";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(express.json());
-app.use(express.static("public")); // serve index.html if in /public
 
-// Save measurement data
+// Needed for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from public
+app.use(express.static(path.join(__dirname, "public")));
+
+// API endpoint to save data
 app.post("/save", (req, res) => {
   const data = JSON.parse(fs.readFileSync("data.json"));
   data.push({
@@ -15,16 +23,22 @@ app.post("/save", (req, res) => {
     leftArm: req.body.leftArm,
     rightArm: req.body.rightArm
   });
-
   fs.writeFileSync("data.json", JSON.stringify(data, null, 2));
   res.json({ status: "success" });
 });
 
-// Read all data
+// Optional: API to get all data
 app.get("/all", (req, res) => {
   const data = JSON.parse(fs.readFileSync("data.json"));
   res.json(data);
 });
 
+// Make sure root loads index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log("Server running on port", port));
+
+
