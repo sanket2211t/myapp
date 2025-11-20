@@ -6,14 +6,14 @@ import { fileURLToPath } from "url";
 const app = express();
 app.use(express.json());
 
-// Needed for __dirname in ES modules
+// ES Module workaround for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from public
+// Serve static files from 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
-// API endpoint to save data
+// POST endpoint to save data
 app.post("/save", (req, res) => {
   const data = JSON.parse(fs.readFileSync("data.json"));
   data.push({
@@ -27,18 +27,20 @@ app.post("/save", (req, res) => {
   res.json({ status: "success" });
 });
 
-// Optional: API to get all data
+// Optional: GET all data
 app.get("/all", (req, res) => {
   const data = JSON.parse(fs.readFileSync("data.json"));
   res.json(data);
 });
 
-// Make sure root loads index.html
+// Ensure root "/" serves index.html
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on port", port));
+app.listen(port, () => console.log(`Server running on port ${port}`));
+
+
 
 
