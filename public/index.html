@@ -1,55 +1,44 @@
-<!doctype html>
-<html lang="en">
+
+  <!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>Height & Weight Form</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    form { max-width: 420px; }
-    label { display:block; margin-top:12px; }
-    input, textarea { width:100%; padding:8px; margin-top:4px; }
-    button { margin-top:12px; padding:10px 14px; }
-    #status { margin-top:12px; font-weight:bold; }
-  </style>
+  <title>Measurement Form</title>
 </head>
 <body>
-  <h1>Submit Height & Weight</h1>
-  <form id="frm">
-    <label>Height (cm) <input type="number" step="any" id="height" required></label>
-    <label>Weight (kg) <input type="number" step="any" id="weight" required></label>
-    <label>Notes (optional) <textarea id="notes" rows="3"></textarea></label>
+  <h2>Enter Your Measurements</h2>
+
+  <form id="measureForm">
+    <input type="number" id="height" placeholder="Height" required><br><br>
+    <input type="number" id="weight" placeholder="Weight" required><br><br>
+    <input type="number" id="leftArm" placeholder="Left Arm" required><br><br>
+    <input type="number" id="rightArm" placeholder="Right Arm" required><br><br>
     <button type="submit">Submit</button>
   </form>
-  <div id="status"></div>
-  <script>
-    const frm = document.getElementById('frm');
-    const status = document.getElementById('status');
-    frm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      status.textContent = 'Submitting...';
-      const payload = {
-        height_cm: parseFloat(document.getElementById('height').value),
-        weight_kg: parseFloat(document.getElementById('weight').value),
-        notes: document.getElementById('notes').value
-      };
-      try {
-        const res = await fetch('/submit', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        if (res.ok) {
-          status.textContent = '✅ Saved to Google Sheet';
-          frm.reset();
-        } else {
-          status.textContent = 'Error: ' + (json.error || 'unknown');
-        }
-      } catch (err) {
-        status.textContent = 'Network error: ' + err.message;
-      }
-    });
-  </script>
+
+  <p id="msg"></p>
+
+<script>
+document.getElementById("measureForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    height: document.getElementById("height").value,
+    weight: document.getElementById("weight").value,
+    leftArm: document.getElementById("leftArm").value,
+    rightArm: document.getElementById("rightArm").value,
+  };
+
+  const res = await fetch("/save", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+  document.getElementById("msg").innerText = "Saved successfully!";
+});
+</script>
+
 </body>
 </html>
+
